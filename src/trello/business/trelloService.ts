@@ -11,11 +11,7 @@ export class TrelloService {
         
         let turno = `${verifyCalendar.message[6]}${verifyCalendar.message[7]}${verifyCalendar.message[8]}${verifyCalendar.message[9]}-${verifyCalendar.message[3]}${verifyCalendar.message[4]}-${verifyCalendar.message[0]}${verifyCalendar.message[1]}T${client.turno}:00:00.000Z`
 
-        // let matutino = `${verifyCalendar.message[0]}${verifyCalendar.message[1]}/${verifyCalendar.message[3]}${verifyCalendar.message[4]}/${verifyCalendar.message[6]}${verifyCalendar.message[7]}${verifyCalendar.message[8]}${verifyCalendar.message[9]} 09:00`
-        // let noturno = `${verifyCalendar.message[0]}${verifyCalendar.message[1]}/${verifyCalendar.message[3]}${verifyCalendar.message[4]}/${verifyCalendar.message[6]}${verifyCalendar.message[7]}${verifyCalendar.message[8]}${verifyCalendar.message[9]} 19:00`
-        
         let verifyDisponibility        
-
 
         if(client.turno == "Matutino"){
             client.turno = "12"
@@ -60,7 +56,7 @@ export class TrelloService {
         try{
             let trelloReturn:any = []
             const { data } = await axios.get<any>(
-                'https://api.trello.com/1/lists/6306acf1097dfc00603e1b22/cards?key=7cf43dad2facbf4abedf10c351a91f44&token=4dacf4360465fcd7c4f02d07297d21026fd8eacfef387e152b4d9a9667f008ee',
+                `https://api.trello.com/1/lists/6306acf1097dfc00603e1b22/cards?key=${process.env.TRELLO_KEY}&token=${process.env.TRELLO_TOKEN}`,
                 {}
             ); 
             
@@ -75,6 +71,8 @@ export class TrelloService {
                 }
             });
 
+            console.log("trello return ", trelloReturn);
+        
             return trelloReturn
         }
         catch(error){
@@ -85,12 +83,12 @@ export class TrelloService {
     async createNewScheduling(cardClient: any){
         try{
             const { data } = await axios.post<any>(
-                `https://api.trello.com/1/cards?idList=6306acf1097dfc00603e1b22&name=${cardClient.fromName}&desc=${cardClient.desc}&due=${cardClient.due}&pos=top&key=7cf43dad2facbf4abedf10c351a91f44&token=4dacf4360465fcd7c4f02d07297d21026fd8eacfef387e152b4d9a9667f008ee`,
+                `https://api.trello.com/1/cards?idList=6306acf1097dfc00603e1b22&name=${cardClient.fromName}&desc=${cardClient.desc}&due=${cardClient.due}&pos=top&key=${process.env.TRELLO_KEY}&token=${process.env.TRELLO_TOKEN}`,
                 {}
             );        
              if(data){
                 const { data } = await axios.post<any>(
-                    'http://localhost:7070/venon',
+                    `${process.env.API_HOST}venon`,
                     { to: cardClient.clientUser, body: "Agendado! \nCaso precise de algo, estou a disposição!", type: "text", opcoes: {op1: "", op2: ""} },
                     {
                         headers: {

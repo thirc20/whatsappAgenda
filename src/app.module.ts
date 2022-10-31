@@ -5,6 +5,7 @@ import { ChatEntity } from './message/entity/chatExistEntity';
 import { tb_messages } from './message/entity/messagesEntity';
 import { TrelloModule } from './trello/trelloModule';
 import { VenonBotModule } from './venonBot/venonBotModule';
+require('dotenv').config()
 
 
 @Module({
@@ -16,11 +17,11 @@ import { VenonBotModule } from './venonBot/venonBotModule';
     TypeOrmModule.forRoot(
       {
         type: "mysql",
-        host: "localhost",
-        port: 3306,
-        username: "root",
-        password: "password",
-        database: "bot",
+        host: process.env.DB_HOST,
+        port: Number(process.env.DB_PORT),
+        username: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
         synchronize: true,
         logging: true,
         entities: [ChatEntity, tb_messages]

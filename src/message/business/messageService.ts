@@ -14,9 +14,7 @@ export class MessageService {
         @InjectRepository(tb_messages) private messages: Repository<tb_messages>
     ){}
 
-    async chatExisting(user: any){
-        console.log("User1 ", user);
-        
+    async chatExisting(user: any){        
         let chat = await this.messageModel.findLastChat(user.user)  
 
         if(chat == null || chat.inProgress == 0){
@@ -42,7 +40,7 @@ export class MessageService {
                 nameClient: user.nameClient
             }
             await this.saveMessage(message)
-            console.log("Antes do error", chat)
+            
             return await this.verifyMessage(chat)
         }
 
@@ -57,16 +55,14 @@ export class MessageService {
         return await this.messageModel.saveMessage(message)
     }
 
-    async verifyMessage(chat: any){
-        console.log("chat", chat);
-        
+    async verifyMessage(chat: any){        
         try{
             const lastMessage = await this.messageModel.findLastMessage(chat)
 
             if(lastMessage.message == "Agendar"){
                 try{
                     const { data } = await axios.post<any>(
-                        'http://localhost:7070/venon',
+                        `${process.env.API_HOST}venon`,
                         { to: lastMessage.messageFrom, body: "Certo, vamos escolher o dia, me responda de acordo com o exemplo: *01/01/2022*", type: "text", opcoes: {op1: "", op2: ""} },
                         {
                             headers: {
@@ -81,8 +77,6 @@ export class MessageService {
                 }
                 catch(error){
                     if(error.response.status == 404){
-                        console.log(error);
-                        
                         return new HttpException('Not Found', HttpStatus.NOT_FOUND)
                     }
                     
@@ -92,7 +86,7 @@ export class MessageService {
             if(lastMessage.message == "Falar Com a TI"){
                 try{
                     const { data } = await axios.post<any>(
-                    'http://localhost:7070/venon',
+                    `${process.env.API_HOST}venon`,
                     { to: lastMessage.messageFrom, body: "Ok! Um momento!", type: "text", opcoes: {op1: "", op2: ""} },
                     {
                         headers: {
@@ -107,8 +101,6 @@ export class MessageService {
                 }
                 catch(error){
                     if(error.response.status == 404){
-                        console.log(error);
-                        
                         return new HttpException('Not Found', HttpStatus.NOT_FOUND)
                     }
                     
@@ -118,7 +110,7 @@ export class MessageService {
             if(lastMessage.message[2] && lastMessage.message[5] == '/' && lastMessage.message.length == 10){
                 try{
                     const { data } = await axios.post<any>(
-                    'http://localhost:7070/venon',
+                    `${process.env.API_HOST}venon`,
                     { to: lastMessage.messageFrom, body: "Ok! Agora escolha uma opção abaixo:", type: "button", opcoes: {op1: "Matutino", op2: "Noturno"} },
                     {
                         headers: {
@@ -133,8 +125,6 @@ export class MessageService {
                 }
                 catch(error){
                     if(error.response.status == 404){
-                        console.log(error);
-                        
                         return new HttpException('Not Found', HttpStatus.NOT_FOUND)
                     }
                     
@@ -144,7 +134,7 @@ export class MessageService {
             if(lastMessage.message == "Noturno" || lastMessage.message == "Matutino"){
                 try{
                     const { data } = await axios.post<any>(
-                    'http://localhost:7070/venon',
+                    `${process.env.API_HOST}venon`,
                     { to: lastMessage.messageFrom, body: "Perfeito, Me Dê um momento por favor, deixe-me validar se está ok para agendarmos.", type: "text", opcoes: {op1: "", op2: ""} },
                     {
                         headers: {
@@ -155,7 +145,7 @@ export class MessageService {
                     );
 
                     const dataTrello = await axios.post<any>(
-                        'http://localhost:7070/trello',
+                        `${process.env.API_HOST}venon`,
                         { client: lastMessage.messageFrom, turno: lastMessage.message, fromName: lastMessage.nameClient },
                         {
                             headers: {
@@ -164,13 +154,9 @@ export class MessageService {
                                 }, 
                         }
                     )
-
-                    // return data;
                 }
                 catch(error){
-                    if(error.response.status == 404){
-                        console.log(error);
-                        
+                    if(error.response.status == 404){                        
                         return new HttpException('Not Found', HttpStatus.NOT_FOUND)
                     }
                     
@@ -181,7 +167,7 @@ export class MessageService {
                 try{
 
                     const { data } = await axios.post<any>(
-                        'http://localhost:7070/venon',
+                        `${process.env.API_HOST}venon`,
                         { to: lastMessage.messageFrom, body: "*BOT:*\nOlá! Sou o bot da ti da FADESA e vamos começar. ", type: "text", opcoes: {op1: "", op2: "" } },
                         {
                             headers: {
@@ -193,7 +179,7 @@ export class MessageService {
 
                     
                     const data1 = await axios.post<any>(
-                        'http://localhost:7070/venon',
+                        `${process.env.API_HOST}venon`,
                         { to: lastMessage.messageFrom, body: "Primeiro: Escolha uma opção abaixo por favor:", type: "button", opcoes: {op1: "Agendar", op2: "Falar Com a TI" } },
                         {
                             headers: {
@@ -207,9 +193,7 @@ export class MessageService {
                     return data1;
                 }
                 catch(error){
-                    if(error.response.status == 404){
-                        console.log(error);
-                        
+                    if(error.response.status == 404){                        
                         throw new HttpException('Not Found', HttpStatus.NOT_FOUND)
                     }
                     
@@ -218,9 +202,7 @@ export class MessageService {
             }
         }
         catch(error){
-            if(error.response.status == 404){
-                console.log(error);
-                
+            if(error.response.status == 404){                
                 return new HttpException('Not Found', HttpStatus.NOT_FOUND)
             }
             

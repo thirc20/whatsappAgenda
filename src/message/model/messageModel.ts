@@ -27,25 +27,17 @@ export class MessageRepository{
         return await this.chatEntity.save(inserChat)
     }
 
-    async saveMessage(msg: any){
-        console.log(msg);
-        
-
+    async saveMessage(msg: any){   
         const message = new tb_messages()
         message.messageFrom = msg.user;
         message.message = msg.message;
         message.idChat = msg.idChat;
         message.nameClient = msg.nameClient;
-
-        
-        console.log("message ", message);
         
         return await this.messages.save(message)
     }
 
-    async findLastMessage(chat: any){
-        console.log("chat ", chat);
-        
+    async findLastMessage(chat: any){        
         return await this.messages.findOne({
             where: {
                 messageFrom: chat.user 

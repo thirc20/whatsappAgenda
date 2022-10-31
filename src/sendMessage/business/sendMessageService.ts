@@ -27,7 +27,7 @@ export class SendMessageService {
     async sendMessageText(sendMessageText: SendMessageDTO){
         try{            
             const { data } = await axios.post<SendMessageDTO>(
-                'http://localhost:7070/venon',
+                `${process.env.API_HOST}venon`,
                 { to: sendMessageText.to, body: sendMessageText.body, type: sendMessageText.type },
                 {
                     headers: {
@@ -67,8 +67,6 @@ export class SendMessageService {
             // console.log(JSON.stringify(data, null, 4));
                 
             // return data
-
-            
         }
         catch (error){
             if(axios.isAxiosError(error)) {

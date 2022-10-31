@@ -31,30 +31,22 @@ export class InitializeVenonBot {
     }
 
     async scheduling(messageRecived: any) {
-        try {
-            console.log(messageRecived);
-            
-            if (messageRecived.from == "556295491075@c.us" || messageRecived.from == "556293312158@c.us" || messageRecived.from == "5562993312158@c.us" || messageRecived.from == "559492429276@c.us" || messageRecived.from == "559499803400@c.us" || messageRecived.from == "559499803400@c.us") {
-
-                const { data } = await axios.post<any>(
-                    'http://localhost:7070/message',
-                    { user: messageRecived.from, message: messageRecived.body, nameClient: messageRecived.notifyName },
-                    {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Accept: 'application/json'
-                        },
+        try {        
+            const { data } = await axios.post<any>(
+                `${process.env.API_HOST}message`,
+                { user: messageRecived.from, message: messageRecived.body, nameClient: messageRecived.notifyName },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json'
                     },
-                );
+                },
+            );
 
-                console.log(data);
-                
-                
-                return data
-            }
-            else {
-                return "ok"
-            }
+            console.log(data);
+            
+            
+            return data
         }
         catch (error) {
             throw new Error(error);
